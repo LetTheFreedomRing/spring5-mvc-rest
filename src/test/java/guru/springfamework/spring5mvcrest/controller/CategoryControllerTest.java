@@ -19,6 +19,8 @@ import java.util.List;
 
 public class CategoryControllerTest {
 
+    private static final int API_VERSION = 1;
+
     @Mock
     private CategoryService categoryService;
 
@@ -47,7 +49,7 @@ public class CategoryControllerTest {
         Mockito.when(categoryService.getAll()).thenReturn(categories);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/categories/")
+                MockMvcRequestBuilders.get("/api/v" + API_VERSION + "/categories/")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.categories", Matchers.hasSize(categories.size())));
@@ -64,7 +66,7 @@ public class CategoryControllerTest {
         Mockito.when(categoryService.getByName(ArgumentMatchers.anyString())).thenReturn(categoryDTO1);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/categories/" + categoryName)
+                MockMvcRequestBuilders.get("/api/v" + API_VERSION + "/categories/" + categoryName)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.equalTo(categoryName)));

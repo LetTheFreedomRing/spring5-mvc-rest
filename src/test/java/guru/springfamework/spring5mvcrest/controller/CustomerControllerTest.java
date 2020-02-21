@@ -17,12 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static guru.springfamework.spring5mvcrest.controller.AbstractRestControllerTest.asJsonString;
+
 public class CustomerControllerTest {
 
     private static final Long CUSTOMER_ID = 1L;
     private static final String CUSTOMER_FIRST_NAME = "Greg";
     private static final String CUSTOMER_LAST_NAME = "House";
-    private static final String CUSTOMER_URL = "URL";
+    private static final int API_VERSION = 1;
+    private static final String CUSTOMER_URL = "/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID;
 
     @Mock
     private CustomerService customerService;
@@ -43,7 +46,7 @@ public class CustomerControllerTest {
         List<CustomerDTO> customers = new ArrayList<>(Arrays.asList(new CustomerDTO(), new CustomerDTO()));
         Mockito.when(customerService.getAll()).thenReturn(customers);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v" + API_VERSION + "/customers/")
             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.customers", Matchers.hasSize(2)));
@@ -59,9 +62,28 @@ public class CustomerControllerTest {
 
         Mockito.when(customerService.getById(ArgumentMatchers.anyLong())).thenReturn(customerDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/" + CUSTOMER_ID)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID)
             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", Matchers.equalTo(CUSTOMER_FIRST_NAME)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname", Matchers.equalTo(CUSTOMER_FIRST_NAME)));
+    }
+
+    @Test
+    public void createCustomer() throws Exception {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(CUSTOMER_ID);
+        customerDTO.setFirstName(CUSTOMER_FIRST_NAME);
+        customerDTO.setLastName(CUSTOMER_LAST_NAME);
+        customerDTO.setCustomerUrl(CUSTOMER_URL);
+
+        Mockito.when(customerService.create(ArgumentMatchers.any())).thenReturn(customerDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v" + API_VERSION + "/customers/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(customerDTO)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname", Matchers.equalTo(CUSTOMER_FIRST_NAME)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastname", Matchers.equalTo(CUSTOMER_LAST_NAME)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID)));
     }
 }

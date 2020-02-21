@@ -63,4 +63,20 @@ public class CustomerServiceTest {
 
         assertEquals(CUSTOMER_ID, customerDTO.getId());
     }
+
+    @Test
+    public void create() {
+        Customer customer = new Customer();
+        customer.setId(CUSTOMER_ID);
+        customer.setFirstName(CUSTOMER_FIRST_NAME);
+        customer.setLastName(CUSTOMER_LAST_NAME);
+
+
+        Mockito.when(customerRepository.save(ArgumentMatchers.any())).thenReturn(customer);
+
+        CustomerDTO savedCustomer = customerService.create(new CustomerDTO());
+        assertEquals(CUSTOMER_ID, savedCustomer.getId());
+        assertEquals(CUSTOMER_FIRST_NAME, savedCustomer.getFirstName());
+        assertEquals(CUSTOMER_LAST_NAME, savedCustomer.getLastName());
+    }
 }
