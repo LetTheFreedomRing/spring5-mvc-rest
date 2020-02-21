@@ -86,4 +86,27 @@ public class CustomerControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lastname", Matchers.equalTo(CUSTOMER_LAST_NAME)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID)));
     }
+
+    @Test
+    public void updateCustomer() throws Exception {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(CUSTOMER_FIRST_NAME);
+        customerDTO.setLastName(CUSTOMER_LAST_NAME);
+
+        CustomerDTO returnDTO = new CustomerDTO();
+        returnDTO.setId(CUSTOMER_ID);
+        returnDTO.setFirstName(CUSTOMER_FIRST_NAME);
+        returnDTO.setLastName(CUSTOMER_LAST_NAME);
+        returnDTO.setCustomerUrl(CUSTOMER_URL);
+
+        Mockito.when(customerService.saveByDTO(ArgumentMatchers.anyLong(), ArgumentMatchers.any())).thenReturn(returnDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(customerDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname", Matchers.equalTo(CUSTOMER_FIRST_NAME)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastname", Matchers.equalTo(CUSTOMER_LAST_NAME)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo(CUSTOMER_URL)));
+    }
 }
