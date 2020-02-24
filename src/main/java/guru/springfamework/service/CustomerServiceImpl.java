@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private static final String CUSTOMER_URL_HEADER = "/api/v1/customers/";
+    public static final String CUSTOMER_URL_HEADER = "/api/v1/customers/";
 
     private final CustomerRepository customerRepository;
     private CustomerMapper customerMapper = CustomerMapper.INSTANCE;

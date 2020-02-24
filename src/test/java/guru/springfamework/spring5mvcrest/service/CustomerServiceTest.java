@@ -78,7 +78,7 @@ public class CustomerServiceTest {
         assertEquals(CUSTOMER_ID, savedCustomer.getId());
         assertEquals(CUSTOMER_FIRST_NAME, savedCustomer.getFirstName());
         assertEquals(CUSTOMER_LAST_NAME, savedCustomer.getLastName());
-        assertEquals("/api/v1/customers/" + CUSTOMER_ID, savedCustomer.getCustomerUrl());
+        assertEquals(CustomerServiceImpl.CUSTOMER_URL_HEADER + CUSTOMER_ID, savedCustomer.getCustomerUrl());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CustomerServiceTest {
         assertEquals(updatedId, savedCustomerDTO.getId());
         assertEquals(CUSTOMER_FIRST_NAME, savedCustomerDTO.getFirstName());
         assertEquals(CUSTOMER_LAST_NAME, savedCustomerDTO.getLastName());
-        assertEquals("/api/v1/customers/" + updatedId, savedCustomerDTO.getCustomerUrl());
+        assertEquals(CustomerServiceImpl.CUSTOMER_URL_HEADER + updatedId, savedCustomerDTO.getCustomerUrl());
     }
 
     @Test

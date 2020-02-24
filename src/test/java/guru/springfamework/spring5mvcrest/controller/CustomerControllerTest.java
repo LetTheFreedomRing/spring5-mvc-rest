@@ -3,6 +3,7 @@ package guru.springfamework.spring5mvcrest.controller;
 import guru.springfamework.api.v1.model.CustomerDTO;
 import guru.springfamework.controller.CustomerController;
 import guru.springfamework.service.CustomerService;
+import guru.springfamework.service.CustomerServiceImpl;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class CustomerControllerTest {
     private static final String CUSTOMER_FIRST_NAME = "Greg";
     private static final String CUSTOMER_LAST_NAME = "House";
     private static final int API_VERSION = 1;
-    private static final String CUSTOMER_URL = "/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID;
+    private static final String CUSTOMER_URL = CustomerServiceImpl.CUSTOMER_URL_HEADER + CUSTOMER_ID;
 
     @Mock
     private CustomerService customerService;
