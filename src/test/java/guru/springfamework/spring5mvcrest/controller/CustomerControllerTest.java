@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,5 +109,35 @@ public class CustomerControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstname", Matchers.equalTo(CUSTOMER_FIRST_NAME)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lastname", Matchers.equalTo(CUSTOMER_LAST_NAME)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo(CUSTOMER_URL)));
+    }
+
+    @Test
+    public void patchCustomer() throws Exception {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName("new name");
+
+        CustomerDTO returnDTO = new CustomerDTO();
+        returnDTO.setFirstName(customerDTO.getFirstName());
+        returnDTO.setLastName(CUSTOMER_LAST_NAME);
+        returnDTO.setCustomerUrl(CUSTOMER_URL);
+
+        Mockito.when(customerService.patchCustomer(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenReturn(returnDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(customerDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstname", Matchers.equalTo(customerDTO.getFirstName())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastname", Matchers.equalTo(CUSTOMER_LAST_NAME)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo(CUSTOMER_URL)));
+    }
+
+    @Test(expected = NestedServletException.class)
+    public void patchCustomerThrowsException() throws Exception {
+        Mockito.when(customerService.patchCustomer(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenThrow(RuntimeException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(new CustomerDTO())));
     }
 }

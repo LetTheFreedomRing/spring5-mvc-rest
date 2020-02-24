@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private static final String CUSTOMER_URL_HEADER = "/api/v1/customer/";
+    private static final String CUSTOMER_URL_HEADER = "/api/v1/customers/";
 
     private final CustomerRepository customerRepository;
     private CustomerMapper customerMapper = CustomerMapper.INSTANCE;
@@ -46,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer savedCustomer = customerRepository.save(customer);
 
         CustomerDTO res = customerMapper.customerToCustomerDTO(savedCustomer);
-        res.setCustomerUrl("/api/v1/customers/" + savedCustomer.getId());
+        res.setCustomerUrl(CUSTOMER_URL_HEADER + savedCustomer.getId());
 
         return res;
     }
@@ -57,5 +57,22 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setId(id);
 
         return save(customer);
+    }
+
+    @Override
+    public CustomerDTO patchCustomer(Long id, CustomerDTO customerDTO) {
+        return customerRepository.findById(id).map(customer -> {
+            if (customerDTO.getFirstName() != null) {
+                customer.setFirstName(customerDTO.getFirstName());
+            }
+            if (customerDTO.getLastName() != null) {
+                customer.setLastName(customerDTO.getLastName());
+            }
+
+            CustomerDTO res = customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+            res.setCustomerUrl(CUSTOMER_URL_HEADER + customer.getId());
+
+            return res;
+        }).orElseThrow(RuntimeException::new); //todo : better exception handling
     }
 }
