@@ -7,6 +7,7 @@ import guru.springfamework.repositories.CategoryRepository;
 import guru.springfamework.repositories.CustomerRepository;
 import guru.springfamework.service.CustomerService;
 import guru.springfamework.service.CustomerServiceImpl;
+import guru.springfamework.service.ResourceNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,7 +89,7 @@ public class CustomerServiceIT {
         assertEquals(EXPECTED_CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void patchCustomerThrowsError() throws Exception {
         customerService.patch(1000L, new CustomerDTO());
     }
@@ -104,7 +105,7 @@ public class CustomerServiceIT {
         assertEquals(customersSizeBeforeDelete - 1, customerRepository.findAll().size());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void deleteByIdThrowsError() throws Exception {
         int customersSizeBeforeDelete = customerRepository.findAll().size();
 

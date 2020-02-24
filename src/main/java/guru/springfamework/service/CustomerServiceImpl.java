@@ -35,7 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getById(Long id) {
-        return customerMapper.customerToCustomerDTO(customerRepository.findById(id).orElse(null));
+        return customerMapper.customerToCustomerDTO(customerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer " + id + " not found")));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
             res.setCustomerUrl(CUSTOMER_URL_HEADER + customer.getId());
 
             return res;
-        }).orElseThrow(RuntimeException::new); //todo : better exception handling
+        }).orElseThrow(() -> new ResourceNotFoundException("Customer " + id + " not found"));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             customerRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new RuntimeException("No customer with id : " + id + " exists");
+            throw new ResourceNotFoundException("Customer " + id + " not found");
         }
     }
 }

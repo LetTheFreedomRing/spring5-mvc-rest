@@ -2,7 +2,9 @@ package guru.springfamework.service;
 
 import guru.springfamework.api.v1.mapper.CategoryMapper;
 import guru.springfamework.api.v1.model.CategoryDTO;
+import guru.springfamework.domain.Category;
 import guru.springfamework.repositories.CategoryRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +30,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDTO getByName(String name) {
-        return categoryMapper.categoryToCategoryDTO(categoryRepository.findByName(name));
+        try {
+            Category foundCategory = categoryRepository.findByName(name);
+            return categoryMapper.categoryToCategoryDTO(foundCategory);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Customer " + name + " not found");
+        }
     }
 }

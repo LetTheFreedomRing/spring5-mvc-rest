@@ -2,8 +2,10 @@ package guru.springfamework.spring5mvcrest.controller;
 
 import guru.springfamework.api.v1.model.CustomerDTO;
 import guru.springfamework.controller.CustomerController;
+import guru.springfamework.controller.RestResponseEntityExceptionHandler;
 import guru.springfamework.service.CustomerService;
 import guru.springfamework.service.CustomerServiceImpl;
+import guru.springfamework.service.ResourceNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class CustomerControllerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(customerController).setControllerAdvice(RestResponseEntityExceptionHandler.class).build();
     }
 
     @Test
@@ -133,13 +134,14 @@ public class CustomerControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.customer_url", Matchers.equalTo(CUSTOMER_URL)));
     }
 
-    @Test(expected = NestedServletException.class)
+    @Test
     public void patchCustomerThrowsException() throws Exception {
-        Mockito.when(customerService.patch(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenThrow(RuntimeException.class);
+        Mockito.when(customerService.patch(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(new CustomerDTO())));
+                .content(asJsonString(new CustomerDTO())))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
@@ -147,6 +149,19 @@ public class CustomerControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(customerService, Mockito.times(1)).deleteById(ArgumentMatchers.anyLong());
+    }
+
+    @Test
+    public void deleteCustomerNotFound() throws Exception {
+        Mockito.doAnswer(invocationOnMock -> {
+            throw new ResourceNotFoundException();
+        }).when(customerService).deleteById(ArgumentMatchers.anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         Mockito.verify(customerService, Mockito.times(1)).deleteById(ArgumentMatchers.anyLong());
     }
