@@ -46,7 +46,7 @@ public class CustomerServiceIT {
 
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setFirstName(updatedFirstName);
-        CustomerDTO updatedCustomerDTO = customerService.patchCustomer(id, customerDTO);
+        CustomerDTO updatedCustomerDTO = customerService.patch(id, customerDTO);
 
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedFirstName, updatedCustomerDTO.getFirstName());
@@ -62,7 +62,7 @@ public class CustomerServiceIT {
 
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setLastName(updatedLastName);
-        CustomerDTO updatedCustomerDTO = customerService.patchCustomer(id, customerDTO);
+        CustomerDTO updatedCustomerDTO = customerService.patch(id, customerDTO);
 
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedLastName, updatedCustomerDTO.getLastName());
@@ -80,7 +80,7 @@ public class CustomerServiceIT {
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setFirstName(updatedFirstName);
         customerDTO.setLastName(updateLastName);
-        CustomerDTO updatedCustomerDTO = customerService.patchCustomer(id, customerDTO);
+        CustomerDTO updatedCustomerDTO = customerService.patch(id, customerDTO);
 
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedFirstName, updatedCustomerDTO.getFirstName());
@@ -90,7 +90,25 @@ public class CustomerServiceIT {
 
     @Test(expected = RuntimeException.class)
     public void patchCustomerThrowsError() throws Exception {
-        customerService.patchCustomer(1000L, new CustomerDTO());
+        customerService.patch(1000L, new CustomerDTO());
+    }
+
+    @Test
+    public void deleteById() throws Exception {
+        Long id = getCustomerIdValue();
+
+        int customersSizeBeforeDelete = customerRepository.findAll().size();
+
+        customerService.deleteById(id);
+
+        assertEquals(customersSizeBeforeDelete - 1, customerRepository.findAll().size());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void deleteByIdThrowsError() throws Exception {
+        int customersSizeBeforeDelete = customerRepository.findAll().size();
+
+        customerService.deleteById((long) (customersSizeBeforeDelete + 1000));
     }
 
     private Long getCustomerIdValue() {

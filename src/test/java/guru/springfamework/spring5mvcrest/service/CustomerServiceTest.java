@@ -102,4 +102,13 @@ public class CustomerServiceTest {
         assertEquals(CUSTOMER_LAST_NAME, savedCustomerDTO.getLastName());
         assertEquals("/api/v1/customers/" + updatedId, savedCustomerDTO.getCustomerUrl());
     }
+
+    @Test
+    public void deleteById() {
+        Long id = 1L;
+
+        customerService.deleteById(id);
+
+        Mockito.verify(customerRepository, Mockito.times(1)).deleteById(ArgumentMatchers.anyLong());
+    }
 }

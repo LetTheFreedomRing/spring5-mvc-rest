@@ -121,7 +121,7 @@ public class CustomerControllerTest {
         returnDTO.setLastName(CUSTOMER_LAST_NAME);
         returnDTO.setCustomerUrl(CUSTOMER_URL);
 
-        Mockito.when(customerService.patchCustomer(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenReturn(returnDTO);
+        Mockito.when(customerService.patch(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenReturn(returnDTO);
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
             .contentType(MediaType.APPLICATION_JSON)
@@ -134,10 +134,19 @@ public class CustomerControllerTest {
 
     @Test(expected = NestedServletException.class)
     public void patchCustomerThrowsException() throws Exception {
-        Mockito.when(customerService.patchCustomer(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenThrow(RuntimeException.class);
+        Mockito.when(customerService.patch(ArgumentMatchers.anyLong(), ArgumentMatchers.any(CustomerDTO.class))).thenThrow(RuntimeException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(new CustomerDTO())));
+    }
+
+    @Test
+    public void deleteCustomer() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v" + API_VERSION + "/customers/" + CUSTOMER_ID + "/")
+            .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(customerService, Mockito.times(1)).deleteById(ArgumentMatchers.anyLong());
     }
 }

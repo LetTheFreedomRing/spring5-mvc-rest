@@ -4,6 +4,7 @@ import guru.springfamework.api.v1.mapper.CustomerMapper;
 import guru.springfamework.api.v1.model.CustomerDTO;
 import guru.springfamework.domain.Customer;
 import guru.springfamework.repositories.CustomerRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO patchCustomer(Long id, CustomerDTO customerDTO) {
+    public CustomerDTO patch(Long id, CustomerDTO customerDTO) {
         return customerRepository.findById(id).map(customer -> {
             if (customerDTO.getFirstName() != null) {
                 customer.setFirstName(customerDTO.getFirstName());
@@ -74,5 +75,14 @@ public class CustomerServiceImpl implements CustomerService {
 
             return res;
         }).orElseThrow(RuntimeException::new); //todo : better exception handling
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        try {
+            customerRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new RuntimeException("No customer with id : " + id + " exists");
+        }
     }
 }
