@@ -5,6 +5,7 @@ import guru.springfamework.bootstrap.Bootstrap;
 import guru.springfamework.domain.Customer;
 import guru.springfamework.repositories.CategoryRepository;
 import guru.springfamework.repositories.CustomerRepository;
+import guru.springfamework.repositories.VendorRepository;
 import guru.springfamework.service.CustomerService;
 import guru.springfamework.service.CustomerServiceImpl;
 import guru.springfamework.service.ResourceNotFoundException;
@@ -21,19 +22,20 @@ import static org.junit.Assert.assertEquals;
 @DataJpaTest
 public class CustomerServiceIT {
 
-    private static final String EXPECTED_CUSTOMER_URL_HEADER = "/api/v1/customers/";
-
     @Autowired
     CustomerRepository customerRepository;
 
     @Autowired
     CategoryRepository categoryRepository;
 
+    @Autowired
+    VendorRepository vendorRepository;
+
     CustomerService customerService;
 
     @Before
     public void setUp() throws Exception {
-        Bootstrap bootstrap = new Bootstrap(categoryRepository, customerRepository);
+        Bootstrap bootstrap = new Bootstrap(categoryRepository, customerRepository, vendorRepository);
         bootstrap.run();
 
         customerService = new CustomerServiceImpl(customerRepository);
@@ -52,7 +54,7 @@ public class CustomerServiceIT {
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedFirstName, updatedCustomerDTO.getFirstName());
         assertEquals(customer.getLastName(), updatedCustomerDTO.getLastName());
-        assertEquals(EXPECTED_CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
+        assertEquals(CustomerServiceImpl.CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
     }
 
     @Test
@@ -68,7 +70,7 @@ public class CustomerServiceIT {
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedLastName, updatedCustomerDTO.getLastName());
         assertEquals(customer.getFirstName(), updatedCustomerDTO.getFirstName());
-        assertEquals(EXPECTED_CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
+        assertEquals(CustomerServiceImpl.CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
     }
 
     @Test
@@ -86,7 +88,7 @@ public class CustomerServiceIT {
         assertEquals(customer.getId(), updatedCustomerDTO.getId());
         assertEquals(updatedFirstName, updatedCustomerDTO.getFirstName());
         assertEquals(updateLastName, updatedCustomerDTO.getLastName());
-        assertEquals(EXPECTED_CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
+        assertEquals(CustomerServiceImpl.CUSTOMER_URL_HEADER + id, updatedCustomerDTO.getCustomerUrl());
     }
 
     @Test(expected = ResourceNotFoundException.class)
